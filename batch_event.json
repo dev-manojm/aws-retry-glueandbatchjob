@@ -1,0 +1,16 @@
+{
+  "detail-type": [
+    "Batch Job State Change"
+  ],
+  "source": [
+    "aws.batch"
+  ],
+  "detail": {
+    "status": [
+      "FAILED"
+    ],
+    "jobQueue": [
+      "arn:aws:batch:us-east-1:455077397705:job-queue/ingestor-s3-to-sqs-dev-us"
+    ]
+  }
+}
