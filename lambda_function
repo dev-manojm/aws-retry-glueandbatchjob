@@ -1,0 +1,44 @@
+import json
+import boto3
+import time
+
+
+s3 = boto3.client('s3')
+
+
+def lambda_handler(event, context):
+    # TODO implement
+    if event["detail-type"] == "Batch Job State Change":
+        s3 = boto3.client('s3')
+        
+        s3_bucket = event["detail"]["container"]["environment"][0]["value"]
+        prefix = event["detail"]["container"]["environment"][2]["value"]
+        try:
+            print("Trying to re-ingest: bucket and location: ",s3_bucket, prefix)
+            response = s3.get_object(Bucket=s3_bucket, Key=prefix)["Body"].read().decode('utf-8')
+            non_ascii_content = ''.join(i for i in response if ord(i)<128)
+            non_ascii_no_special_char_content = ''.join(i for i in non_ascii_content if ord(i) is not 92)
+            new_filename = prefix.replace('-c000', '-RE_IN-c000')
+            print("New filename: ", new_filename)
+        except(e):
+            print("Some error occured while cleaning the file: ", e)
+        try:
+            print("Uploading the cleaned file to the S3 location")
+            response=s3.put_object(Body=non_ascii_no_special_char_content, Bucket=s3_bucket, Key=new_filename)
+            
+            print("Done uploading", response_2)
+        except(e):
+            print("Some error occured during file upload: ", e)
+    else:
+        glue = boto3.client('glue')
+        # Wait for 1 hour
+        time.sleep(3600)
+        jobName = event["detail"]["jobName"]
+        jobRunId = event["detail"]["jobRunId"]
+        response = glue.start_job_run(JobName=jobName, JobRunId = jobRunId)
+        
+    return {
+        'statusCode': 200,
+        'body': json.dumps("Done")
+        
+    }
