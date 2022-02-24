@@ -1,0 +1,16 @@
+{
+  "detail-type": [
+    "Glue Job State Change"
+  ],
+  "source": [
+    "aws.glue"
+  ],
+  "detail": {
+    "status": [
+      "FAILED"
+    ],
+    "message": [
+      "Resource Unavailable"
+    ]
+  }
+}
